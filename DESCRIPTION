@@ -23,7 +23,8 @@ Imports:
     dplyr,
     glue,
     tibble,
-    purrr
+    purrr,
+    withr
 Suggests: 
     knitr,
     rmarkdown,

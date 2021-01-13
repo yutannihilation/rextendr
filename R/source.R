@@ -126,20 +126,35 @@ rust_source <- function(file, code = NULL, dependencies = NULL,
   # Get target name, not null for Windows
   specific_target <- get_specific_target_name()
 
-  status <- system2(
-    command = "cargo",
-    args = c(
-      sprintf("+%s", toolchain),
-      "build",
-      "--lib",
-      if (!is.null(specific_target)) sprintf("--target %s", specific_target) else NULL,
-      sprintf("--manifest-path %s", file.path(dir, "Cargo.toml")),
-      sprintf("--target-dir %s", file.path(dir, "target")),
-      if (profile == "release") "--release" else NULL
-    ),
-    stdout = stdout,
-    stderr = stdout
+  envvars <- character(0)
+
+  if (.Platform$OS.type == "windows") {
+    rtools_path <- normalizePath(file.path(Sys.getenv("RTOOLS40_HOME"), "usr", "bin"))
+
+    cargo_home_default <- file.path(Sys.getenv("USERPROFILE"), ".cargo")
+    cargo_path <- normalizePath(file.path(Sys.getenv("CARGO_HOME", unset = cargo_home_default), "bin"))
+
+    envvars <- c(PATH = paste(rtools_path, cargo_path, sep = ";"))
+  }
+
+  withr::with_envvar(
+    envvars,
+    status <- system2(
+      command = "cargo",
+      args = c(
+        sprintf("+%s", toolchain),
+        "build",
+        "--lib",
+        if (!is.null(specific_target)) sprintf("--target %s", specific_target) else NULL,
+        sprintf("--manifest-path %s", file.path(dir, "Cargo.toml")),
+        sprintf("--target-dir %s", file.path(dir, "target")),
+        if (profile == "release") "--release" else NULL
+      ),
+      stdout = stdout,
+      stderr = stdout
+    )
   )
+
   if (status != 0L) {
     stop("Rust code could not be compiled successfully. Aborting.", call. = FALSE)
   }
