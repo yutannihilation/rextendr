@@ -21,22 +21,25 @@ generated or not.}
 file in the cases when generating wrappers by Rust code failed. This might
 be needed when the wrapper file is accidentally lost or corrupted.}
 
-\item{compile}{If \code{TRUE} always recompiles the package; if \code{NA}
-recompiles if needed (as determined by \code{\link[pkgbuild:needs_compile]{pkgbuild::needs_compile()}});
-if \code{FALSE}, never recompiles.}
+\item{compile}{Logical indicating whether to recompile DLLs:
+\describe{
+\item{\code{TRUE}}{always recompiles}
+\item{\code{NA}}{recompiles if needed (i.e., any source files or manifest file are newer than the DLL)}
+\item{\code{FALSE}}{never recompiles}
+}}
 }
 \value{
 (Invisibly) Path to the file containing generated wrappers.
 }
 \description{
-This function generates wrapper code corresponding to the extendr module
-for an R package. This is useful in package development, where we generally
-want appropriate R code wrapping the Rust functions implemented via extendr.
+This function generates wrapper code corresponding to the extendr module for
+an R package. This is useful in package development, where we generally want
+appropriate R code wrapping the Rust functions implemented via extendr.
 }
 \details{
 To run \code{register_extendr()}, the R package containing extendr code must have
-previously been compiled and installed. If this condition is met, the
-wrapper code will be retrieved from the compiled Rust code and saved into
+previously been compiled and installed. If this condition is met, the wrapper
+code will be retrieved from the compiled Rust code and saved into
 \code{R/extendr-wrappers.R}. Afterwards, you will have to re-document and then
 re-install the package for the wrapper functions to take effect.
 }
