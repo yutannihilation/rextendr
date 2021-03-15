@@ -127,6 +127,12 @@ make_wrappers_externally <- function(module_name, package_name, outfile,
                                     path, use_symbols = FALSE, quiet = FALSE,
                                     compile = NA) {
 
+  path <- rprojroot::find_package_root_file(path = path)
+
+  if (isTRUE(is.na(compile))) {
+    compile <- needs_compilation(path, quiet) || pkgbuild::needs_compile(path)
+  }
+
   func <- function(path, make_wrappers, compile, quiet,
                    module_name, package_name, outfile,
                    use_symbols, ...) {
@@ -158,7 +164,7 @@ make_wrappers_externally <- function(module_name, package_name, outfile,
   }
 
   args <- list(
-    path = rprojroot::find_package_root_file(path = path),
+    path = path,
     make_wrappers = make_wrappers,
     compile = compile,
     # arguments passed to make_wrappers()
